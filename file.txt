@@ -1,0 +1,2350 @@
+
+
+
+
+
+<!doctype html>
+
+    <html dir="rtl">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>
+    ثبت درخواست
+</title>
+    <link rel="apple-touch-icon" sizes="57x57" href="/static/images/favicon/apple-touch-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/static/images/favicon/apple-touch-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/static/images/favicon/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/static/images/favicon/apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/static/images/favicon/apple-touch-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/static/images/favicon/apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/static/images/favicon/apple-touch-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/static/images/favicon/apple-touch-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/static/images/favicon/apple-touch-icon-180x180.png">
+<link rel="icon" type="image/png" href="/static/images/favicon/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/static/images/favicon/android-chrome-192x192.png" sizes="192x192">
+<link rel="icon" type="image/png" href="/static/images/favicon/favicon-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/static/images/favicon/favicon-16x16.png" sizes="16x16">
+<link rel="mask-icon" href="/static/images/favicon/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="msapplication-TileImage" content="/mstile-144x144.png">
+<meta name="theme-color" content="#41b392">
+    <script src="/static/inspinia/js/jquery-3.1.1.min.js?v=10.07.1"></script>
+
+
+
+        <link href="/static/inspinia/css/bootstrap.min.css?v=10.07.1" rel="stylesheet"/>
+        <link href="/static/inspinia/css/animate.css?v=10.07.1" rel="stylesheet"/>
+        <link href="/static/theme/font-awesome/css/font-awesome.min.css?v=10.07.1" rel="stylesheet"/>
+
+        <link href="/static/inspinia/css/style.css?v=10.07.1" rel="stylesheet"/>
+
+
+
+        <link href="/static/lib/select2/select2.css?v=10.07.1" rel="stylesheet"/>
+        <link href="/static/lib/select2/select2-override.css?v=10.07.1" rel="stylesheet"/>
+
+    <link href="/static/inspinia/css/plugins/sweetalert/sweetalert.css?v=10.07.1" rel="stylesheet"/>
+
+
+
+
+
+
+        <script src="/static/inspinia/js/bootstrap.min.js?v=10.07.1"></script>
+        <script src="/static/inspinia/js/inspinia.js?v=10.07.1"></script>
+        <script src="/static/inspinia/js/plugins/validate/jquery.validate.min.js?v=10.07.1"></script>
+
+
+
+        <script>
+            var GLOBAL_MAX_FILE_SIZE = 512000;
+
+        </script>
+
+<script>
+    function readURL(input, img) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $(img).attr('src', e.target.result);
+            };
+
+            reader.onloadend = function () {
+                $(img).attr('src', reader.result);
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function getFilesize(fileInput) {
+        var sizeinbytes;
+        if (window.ActiveXObject) {
+            var fso = new ActiveXObject("Scripting.FileSystemObject");
+            var filepath = fileInput.value;
+            var thefile = fso.getFile(filepath);
+            sizeinbytes = thefile.size;
+        } else {
+            if (fileInput.files.length > 0) {
+                sizeinbytes = fileInput.files[0].size;
+            }
+        }
+
+        return sizeinbytes;
+    }
+
+
+    function resetFormElement(e) {
+        e.wrap('<form>').closest('form').get(0).reset();
+        e.unwrap();
+        if (e.parent().find("img").length > 0) {
+            var img = e.parent().find("img").first();
+            img.remove();
+        }
+    }
+
+
+    function checkImageType(fileTypeStr, thisFile) {
+        var class_attr = thisFile.attr("class")
+        if (!(class_attr.includes("extra_file"))) {
+
+            if ($.inArray(fileTypeStr, ['JPG', 'JPEG', 'jpg', 'jpeg']) == -1) {
+
+                var attr = thisFile.attr('id');
+                var errorSpan = document.getElementById(attr + "typeError");
+                if (errorSpan == null) {
+                    var x = document.createElement("SPAN");
+                    var t = document.createTextNode("پسوند فایل بارگذاری شده مورد قبول نمی باشد. لطفا فقط از فایل با فرمت jpg یا jpeg استفاده نمایید.");
+                    x.setAttribute("class", "help-block m-b-none");
+                    x.setAttribute("style", "color: #ff0000");
+                    x.setAttribute("id", attr + "typeError");
+                    x.appendChild(t);
+                    var selected_div = thisFile.closest('div[class="col-sm-7"]');
+                    selected_div.append(x);
+                }
+                return 1;
+
+
+            } else {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+
+    }
+
+    function validate_image(file, show = true) {
+        var ext = $(file).val().split('.').pop().toLowerCase();
+        var flag = checkImageType(ext, $(file));
+        var size = getFilesize(file);
+
+        //  if (size > GLOBAL_MAX_FILE_SIZE || flag) {
+        //$(file).parents(".form-group").addClass("has-error");
+        //
+        //    resetFormElement($(file));
+        //      return;
+        //    }
+        var selector = $(file).attr('name') + "_cache_key";
+
+        var img;
+        if ($(file).parent().find("img").length > 0) {
+            img = $(file).parent().find("img").first();
+        } else {
+            img = $("<img class='preview-img ibox-content text-center' />");
+            $(file).after(img);
+        }
+        if (flag) {
+            $(file).val("")
+        }
+        if (show) {
+            readURL(file, img);
+            $(img).height(200);
+        }
+    }
+
+    $(document).ready(function () {
+        $("form img[src='/static/images/base/default-user.png']").each(function () {
+            $(this).parents(".form-group").addClass("has-error");
+        });
+
+        $("input[type=file]").change(function () {
+            var ext = $(this).val().split('.').pop().toLowerCase();
+            var flag = checkImageType(ext, $(this));
+            var size = getFilesize(this);
+            if (size > GLOBAL_MAX_FILE_SIZE || flag) {
+                $(this).parents(".form-group").addClass("has-error");
+                resetFormElement($(this));
+                return;
+            } else {
+                $(this).parents(".form-group").removeClass('has-error');
+            }
+            var img;
+            if ($(this).parent().find("img").length > 0) {
+                img = $(this).parent().find("img").first();
+            } else {
+                img = $("<img class='preview-img ibox-content text-center' />");
+                $(this).after(img);
+            }
+            has_error = $(this).parents(".form-group").hasClass("has-error");
+            is_extra = $(this).attr("id").includes("extra")
+            if (!has_error && is_extra){
+                readURL(this, img);
+                $(img).height(200);
+            }
+
+        });
+    });
+
+
+</script>
+
+    <script>
+        var alert_keyboard = "لطفا صفحه کلید خود را در وضعیت انگلیسی قرار دهید";
+        var alert_only_english_letter = "لطفا فقط از کاراکترهای انگلیسی استفاده کنید";
+        var alert_invalid_charachter = "استفاده از این کاراکترها مجاز نمی باشد: ^{ }< >*%&:\/ "
+    </script>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('#internet-submit').on('click', function () {
+            swal({
+                title: "آیا از ثبت نهایی درخواست اطمینان دارید؟",
+                text: "بعد از ثبت نهایی امکان ویرایش وجود ندارد",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "ادامه",
+                cancelButtonText: "انصراف",
+                closeOnConfirm: false,
+                closeOnCancel: true
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $('#register_form').submit();
+
+                }
+            });
+        });
+
+        $('#register-submit').on('click', function () {
+            swal({
+                title: "آیا از ثبت نهایی درخواست اطمینان دارید؟",
+                text: "بعد از ثبت نهایی امکان ویرایش وجود ندارد",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "ادامه",
+                cancelButtonText: "انصراف",
+                closeOnConfirm: false,
+                closeOnCancel: true
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $('#register_form').submit();
+                }
+            });
+        });
+    });
+</script>
+            <script src="/static/inspinia/js/plugins/sweetalert/sweetalert.min.js?v=10.07.1"></script>
+
+
+
+        <script src="/static/lib/select2/select2.min.js?v=10.07.1"></script>
+
+
+    <script src="/static/inspinia/js/plugins/slimscroll/jquery.slimscroll.min.js?v=10.07.1"></script>
+
+
+
+    <script type="text/javascript">
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        })
+
+    </script>
+
+
+
+            <link href="/static/css/base/overwrite.css?v=10.07.1" rel="stylesheet"/>
+
+
+            <link href="/static/inspinia/css/plugins/bootstrap-rtl/bootstrap-rtl.min.css?v=10.07.1" rel="stylesheet"/>
+            <link href="/static/theme/css/req-rtl.css?v=10.07.1" rel="stylesheet"/>
+
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js" %}" ></script>
+			<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js" %}" ></script>
+		<![endif]-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+
+    <script>
+    $(function () {
+        // Add refresh button after field (this can be done in the template as well)
+        $(".captcha_refresh").remove();
+        $('img.ecaptcha').after(
+                $('<a href="#void" class="btn btn-primary btn-circle captcha_refresh " style=""><i class="fa fa-refresh"></i></a> ')
+
+        );
+
+        // Click-handler for the refresh-link
+        $('.captcha_refresh').click(function () {
+            var $form = $(this).parents('form');
+            var url = location.protocol + "//" + window.location.hostname + ":"
+                    + location.port + "/ecaptcha/refresh/";
+
+            // Make the AJAX-call
+            $.getJSON(url, {}, function (json) {
+                $form.find('input[name="captcha_0"]').val(json.key);
+                $form.find('img.ecaptcha').attr('src', json.image_url);
+            });
+
+            return false;
+        });
+    });
+</script>
+
+        <body class="rtls" id="page-top" ondragstart="return false;" ondrop="return false;">
+
+<div class="stage_wrapper">
+    <div class="stage"
+         style="left : 49px; ">
+        <div id="vertical-timeline" class="vertical-container light-timeline">
+            <div class="vertical-timeline-block">
+
+
+
+                    <div class="vertical-timeline-icon-wrapper animated fadeOut infinite" style="border-color:#41b393;">
+                    </div>
+
+                <div class="vertical-timeline-icon navy-bg">
+                    <i class="fa fa-briefcase"></i>
+                </div>
+
+                <div class="vertical-timeline-content">
+                    <h4 style="font-weight: 600;">شایستگی دریافت روادید</h4>
+
+                </div>
+            </div>
+
+            <div class="vertical-timeline-block">
+
+                <div class="vertical-timeline-icon blue-bg">
+                    <i class="fa fa-file-text"></i>
+                </div>
+
+                <div class="vertical-timeline-content">
+                    <h4 style="font-weight: 200;">اطلاعات درخواست روادید</h4>
+
+                </div>
+            </div>
+
+            <div class="vertical-timeline-block">
+
+                <div class="vertical-timeline-icon lazur-bg">
+                    <i class="fa fa-envelope"></i>
+                </div>
+
+
+                <div class="vertical-timeline-content">
+                    <h4 style="font-weight: 200;">تایید ایمیل و ثبت نهایی</h4>
+
+                </div>
+            </div>
+
+
+            <div class="vertical-timeline-block">
+
+                <div class="vertical-timeline-icon yellow-bg">
+                    <i class="fa fa-coffee"></i>
+                </div>
+
+                <div class="vertical-timeline-content">
+                    <h4 style="font-weight: 200;">پایان مراحل ثبت درخواست</h4>
+
+                </div>
+            </div>
+
+            <div class="vertical-timeline-block">
+
+                <div class="vertical-timeline-icon lazur-bg">
+                    <i class="fa fa-user-md"></i>
+                </div>
+
+                <div class="vertical-timeline-content">
+                    <a href="/fa/request/status/"><h4
+                            style="font-weight: 200;">بررسی وضعیت درخواست</h4></a>
+
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+        </div>
+
+    </div>
+</div>
+    <div class="container" style="    position: relative;z-index: 9999;">
+                <div class="carousel-caption back">
+                    <h1 class="font-bold">درخواست جدید</h1>
+
+                </div>
+            </div>
+<div class="navbar-wrapper">
+    <nav class="navbar navbar-default navbar-fixed-top animated fadeIn" role="navigation">
+        <div class="container" style="height: 203px;">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                        aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand"
+                   href="http://e_visa.mfa.ir/">روادیــد الکتــرونیکی</a>
+            </div>
+            <div class="navbar-header page-scroll exp">
+                <p class="navbar-brand-exp" href="#">جمهوری اسلامی ایران</p>
+                <p class="navbar-brand-exp" href="#">وزارت امور خارجه</p>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+
+                </ul>
+
+                <ul class="nav navbar-nav navbar-left">
+
+
+
+
+
+
+    <a href="/fa/login/" class="btn btn-primary btn-w-m btn-outline login-button">
+        <i class="fa fa-user"></i>
+        ورود
+    </a>
+
+
+
+
+                </ul>
+
+                <ul class="nav navbar-nav navbar-left">
+
+
+
+
+
+                                <li>
+                                    <a class=""
+                                       href="/en/request/applyrequest/" title = "English">en</a>
+                                </li>
+
+
+
+
+
+                                <li>
+                                    <a class="active"
+                                       href="/fa/request/applyrequest/" title = "Persian">fa</a>
+                                </li>
+
+
+
+
+
+                                <li>
+                                    <a class=""
+                                       href="/ar/request/applyrequest/" title = "Arabic">ar</a>
+                                </li>
+
+
+
+
+
+                                <li>
+                                    <a class=""
+                                       href="/de/request/applyrequest/" title = "Deutsch">de</a>
+                                </li>
+
+
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
+<div class="carousela animated fadeIn" data-ride="carousela" id="inSlider" style="border-bottom: solid #41b393 5px;">
+    <div class="carousel-inner">
+        <div class="item active">
+
+            <div class="overlayheader"></div>
+            <div class="header-back apply">&nbsp;</div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+<section class="grey-section registerform">
+    <div class="wrapper wrapper-content " style="z-index: 10;">
+        <div class="row">
+            <div class="col-lg-12">
+
+    <div class="row">
+
+        <div class="col-lg-10">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <h5>ثبت درخواست</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="wrapper wrapper-content">
+
+
+
+                            <div class="row">
+                                <div class="col-md-5"></div>
+                                <div class="col-md-7" style="text-align: center;color: #41b392;"></div>
+                            </div>
+
+                            <div class="row">
+
+                                <div class="col-md-5 animated fadeInRight wow"
+                                     style="padding-left: 0px;padding-right: 0px;">
+                                    <div class="submission-guid">
+
+
+<h2 class="navy"><i class="fa fa-flag" style="    margin: 5px;color: #41b392;"></i>نکاتی که قبل از درخواست روادید باید بدانید:</h2>
+<ul class="margin-bottom-none padding-left-lg textright">
+    <li>در صورتی که شما دارای ملیت دوگانه هستید، لطفا ملیت خود را بر اساس گذرنامه ای که قصد استفاده برای سفر به ایران را دارید انتخاب نمایید.</li>
+    <li>در صورتی که ملیت چاپ شده بر روی روادید با ملیت گذرنامه مغایرت داشته باشد، روادید از ارزش اعتبار ساقط خواهد شد.</li>
+    <li>برای دریافت روادید ارائه گذرنامه معتبر که حداقل شش ماه از اعتبار آن باقی مانده باشد الزامی است.</li>
+    <li>لطفا عکس پرسنلی را بر اساس استانداردهای مشخص شده بارگذاری نمایید.<span
+            class="under_link"><a href="/fa/request/digital_image_requirement/?title_name=photo"
+                                  target="_blank">راهنمای استاندارد عکس پرسنلی</a></span>
+    </li>
+    <li>لطفا اسکن صفحه اول گذرنامه خود را بر اساس استانداردهای مشخص شده بارگذاری نمایید. <span
+            class="under_link"><a href="/fa/request/digital_image_requirement/?title_name=passport"
+                                  target="_blank">راهنمای استاندارد اسکن گذرنامه</a></span></li>
+</ul>
+                                    </div>
+                                    <div class="submission-guid-photo image-link" style=" padding: 85px 32px;">
+                                        <a href="/fa/request/image_tools/">
+
+
+<div style="width: 100%">
+<img src="/static/theme/img/image-tool.png" alt="" width="200" style="    margin: 0 auto;display: block;">
+</div>
+<h2 class="navy" style="text-align: center">با بهره گیری از ابزار تصویر روادید، استاندارد بودن عکس پرسنلی و یا کپی گذرنامه خود را کنترل نمایید.</h2>
+
+
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-md-1 register-form-gap"></div>
+                                <div class="col-md-6 animated fadeInLeft wow">
+
+
+
+                                        <div style="    width: 80%;margin: 0 auto 30px;">
+
+                                            <h1 style="text-align: center;color: #41b392">شایستگی دریافت روادید</h1>
+                                            <p>در این مرحله، امکان دریافت روادید برای ملیت انتخاب شده بررسی خواهد شد. لطفا قبل از تکمیل فرم درخواست، نکات مندرج در ستون سمت راست را مطالعه نمایید.</p>
+
+                                        </div>
+
+
+                                    <form method="post" enctype="multipart/form-data" id="register_form"
+                                          class="form-horizontal" novalidate="">
+                                        <input type="hidden" name="csrfmiddlewaretoken" value="JvjdERZOLbUBNn7DMJIkmMmrTOXN9rTVQaZzTgKKXrqpmnR4JA1omrD6NnovVM04">
+                                        <input type="hidden" id="translate_lang" value="fa">
+
+
+
+
+
+
+
+<div
+     class="form-group ">
+    <label class="col-sm-3 control-label" style="margin-left:0px;">نوع روادید
+        <span class="required_field">*</span>
+    </label>
+
+    <div class="col-sm-7">
+
+
+                <select name="visa_type" class="select2_combo form-control" required data-toggle=&#39;tooltip&#39; data-placement=&#39;left&#39; ="" required id="id_visa_type">
+  <option value="" selected>------------</option>
+
+  <option value="1">ورود</option>
+
+  <option value="11">جهانگردی</option>
+
+  <option value="21">زیارتی</option>
+
+  <option value="31">سیاسی</option>
+
+  <option value="41">خدمت</option>
+
+  <option value="71">عبور</option>
+
+  <option value="81">مطبوعاتی</option>
+
+  <option value="101">خانواده</option>
+
+  <option value="121">تجاری</option>
+
+  <option value="261">بازدید بستگان</option>
+
+  <option value="311">جهانگردی (فوری)</option>
+
+</select>
+
+
+        <span class="help-block m-b-none help_span"></span>
+
+
+            <span class="help-block m-b-none" id="v-description" style="color: #0e886f"></span>
+
+
+
+
+
+
+
+
+    </div>
+    <div class="col-sm-2"></div>
+</div>
+
+
+
+
+
+
+
+<div
+     class="form-group ">
+    <label class="col-sm-3 control-label" style="margin-left:0px;">ملیت
+        <span class="required_field">*</span>
+    </label>
+
+    <div class="col-sm-7">
+
+
+                <select name="nationality" class="select2_combo form-control" required data-toggle=&#39;tooltip&#39; data-placement=&#39;left&#39; ="" required id="id_nationality">
+  <option value="" selected>------------</option>
+
+  <option value="161">آذربایجان</option>
+
+  <option value="111">آرژانتین</option>
+
+  <option value="131">آروبا</option>
+
+  <option value="1961">آفریقای جنوبی</option>
+
+  <option value="41">آلبانی</option>
+
+  <option value="791">آلمان</option>
+
+  <option value="101">آنتیگوا و باربودا</option>
+
+  <option value="71">آندورا</option>
+
+  <option value="81">آنگولا</option>
+
+  <option value="91">آنگویلا</option>
+
+  <option value="151">اتریش</option>
+
+  <option value="681">اتیوپی</option>
+
+  <option value="1061">اردن</option>
+
+  <option value="121">ارمنستان</option>
+
+  <option value="661">اریتره</option>
+
+  <option value="2271">ازبکستان</option>
+
+  <option value="1981">اسپانیا</option>
+
+  <option value="141">استرالیا</option>
+
+  <option value="671">استونی</option>
+
+  <option value="1921">اسلوواکی</option>
+
+  <option value="1931">اسلوونی</option>
+
+  <option value="2041">اسواتيني</option>
+
+  <option value="421">افریقای مرکزی</option>
+
+  <option value="21">افغانستان</option>
+
+  <option value="621">اکوادور</option>
+
+  <option value="51">الجزایر</option>
+
+  <option value="641">السالوادور</option>
+
+  <option value="2211">امارات متحده عربی</option>
+
+  <option value="991">اندونزی</option>
+
+  <option value="2221">انگلستان</option>
+
+  <option value="2261">اوروگوئه</option>
+
+  <option value="2201">اوکراین</option>
+
+  <option value="2191">اوگاندا</option>
+
+  <option value="2241">ایالات متحده امریکا</option>
+
+  <option value="1021">ایتالیا</option>
+
+  <option value="1001">ایرلند</option>
+
+  <option value="971">ایسلند</option>
+
+  <option value="201">باربادوس</option>
+
+  <option value="171">باهاما</option>
+
+  <option value="181">بحرین</option>
+
+  <option value="2441">بدون ملیت</option>
+
+  <option value="311">برزیل</option>
+
+  <option value="251">برمودا</option>
+
+  <option value="331">برونئی</option>
+
+  <option value="211">بلاروس</option>
+
+  <option value="221">بلژیک</option>
+
+  <option value="341">بلغارستان</option>
+
+  <option value="231">بلیز</option>
+
+  <option value="191">بنگلادش</option>
+
+  <option value="241">بنین</option>
+
+  <option value="261">بوتان</option>
+
+  <option value="301">بوتسوانا</option>
+
+  <option value="351">بورکینافاسو</option>
+
+  <option value="361">بوروندی</option>
+
+  <option value="291">بوسنی و هرزگوین</option>
+
+  <option value="271">بولیوی</option>
+
+  <option value="281">بونیر</option>
+
+  <option value="1601">پاپوا گینه نو</option>
+
+  <option value="1611">پاراگوئه</option>
+
+  <option value="1571">پاکستان</option>
+
+  <option value="1581">پالائو</option>
+
+  <option value="1591">پاناما</option>
+
+  <option value="1661">پرتغال</option>
+
+  <option value="1621">پرو</option>
+
+  <option value="751">پلینزی فرانسه</option>
+
+  <option value="1671">پورتوریکو</option>
+
+  <option value="1641">پیت کرن</option>
+
+  <option value="2081">تاجیکستان</option>
+
+  <option value="2231">تانزانیا</option>
+
+  <option value="2091">تایلند</option>
+
+  <option value="2171">ترکمنستان</option>
+
+  <option value="2161">ترکیه</option>
+
+  <option value="2141">ترینیداد و توباگو</option>
+
+  <option value="2121">توکلائو</option>
+
+  <option value="2111">توگو</option>
+
+  <option value="2151">تونس</option>
+
+  <option value="2131">تونگا</option>
+
+  <option value="2181">تووالو</option>
+
+  <option value="2101">تیمور شرقی</option>
+
+  <option value="1031">جامائیکا</option>
+
+  <option value="811">جبل الطارق</option>
+
+  <option value="1051">جرزی</option>
+
+  <option value="31">جزایر آلند</option>
+
+  <option value="1941">جزایر سلیمان</option>
+
+  <option value="691">جزایر فارو</option>
+
+  <option value="701">جزایر فالکلند</option>
+
+  <option value="501">جزایر کوک</option>
+
+  <option value="411">جزایر کیمن</option>
+
+  <option value="1281">جزایر مارشال</option>
+
+  <option value="1541">جزایر مارینای شمالی</option>
+
+  <option value="441">جزایر مانش</option>
+
+  <option value="1521">جزایر نورفولک</option>
+
+  <option value="1011">جزیره من</option>
+
+  <option value="2451">جمهوری دموکراتیک کنگو</option>
+
+  <option value="611">جمهوری دومینیکن</option>
+
+  <option value="1701">جمهوری مولداوی</option>
+
+  <option value="591">جیبوتی</option>
+
+  <option value="431">چاد</option>
+
+  <option value="571">چک</option>
+
+  <option value="461">چین</option>
+
+  <option value="2381">چین (تایوان)</option>
+
+  <option value="1211">چین (ماکائو)</option>
+
+  <option value="951">چین (هنگ کنگ)</option>
+
+  <option value="581">دانمارک</option>
+
+  <option value="371">دماغه سبز</option>
+
+  <option value="601">دومینیکا</option>
+
+  <option value="1711">رئونیون</option>
+
+  <option value="1741">رواندا</option>
+
+  <option value="1731">روسیه</option>
+
+  <option value="1721">رومانی</option>
+
+  <option value="2341">زامبیا</option>
+
+  <option value="2351">زیمباوه</option>
+
+  <option value="1041">ژاپن</option>
+
+  <option value="1841">سائوتومه و پرینسیپ</option>
+
+  <option value="521">ساحل عاج</option>
+
+  <option value="1821">ساموآ</option>
+
+  <option value="61">ساموآی امریکا</option>
+
+  <option value="1851">سرک</option>
+
+  <option value="931">سریر مقدس</option>
+
+  <option value="1991">سریلانکا</option>
+
+  <option value="1801">سن بارتلمی</option>
+
+  <option value="1781">سن پیر و میکلون</option>
+
+  <option value="1761">سن کیتس و نویس</option>
+
+  <option value="1771">سن لوسیا</option>
+
+  <option value="1811">سن مارتین</option>
+
+  <option value="1831">سن مارینو</option>
+
+  <option value="1751">سن هلنا</option>
+
+  <option value="1791">سن وینسن و گرنادین</option>
+
+  <option value="1911">سنگاپور</option>
+
+  <option value="1871">سنگال</option>
+
+  <option value="2051">سوئد</option>
+
+  <option value="2061">سوئیس</option>
+
+  <option value="2031">سوالبارد</option>
+
+  <option value="2011">سودان</option>
+
+  <option value="1971">سودان جنوبی</option>
+
+  <option value="2021">سورینام</option>
+
+  <option value="2071">سوریه</option>
+
+  <option value="1951">سومالی</option>
+
+  <option value="1901">سیرالئون</option>
+
+  <option value="1891">سیشل</option>
+
+  <option value="451">شیلی</option>
+
+  <option value="2321">صحرای غربی</option>
+
+  <option value="1881">صربستان</option>
+
+  <option value="2391">صربستان (کوزوو)</option>
+
+  <option value="11">عراق</option>
+
+  <option value="1861">عربستان سعودی</option>
+
+  <option value="1561">عمان</option>
+
+  <option value="801">غنا</option>
+
+  <option value="731">فرانسه</option>
+
+  <option value="2001">فلسطین</option>
+
+  <option value="721">فنلاند</option>
+
+  <option value="711">فیجی</option>
+
+  <option value="1631">فیلیپین</option>
+
+  <option value="561">قبرس</option>
+
+  <option value="1111">قرقیزستان</option>
+
+  <option value="1071">قزاقستان</option>
+
+  <option value="1681">قطر</option>
+
+  <option value="511">کاستاریکا</option>
+
+  <option value="1461">کالونیای جدید</option>
+
+  <option value="381">کامبوج</option>
+
+  <option value="391">کامرون</option>
+
+  <option value="401">کانادا</option>
+
+  <option value="1691">کره جنوبی</option>
+
+  <option value="1531">کره شمالی</option>
+
+  <option value="531">کرواسی</option>
+
+  <option value="471">کلمبیا</option>
+
+  <option value="491">کنگو</option>
+
+  <option value="1081">کنیا</option>
+
+  <option value="541">کوبا</option>
+
+  <option value="551">کوراسائو</option>
+
+  <option value="481">کومور</option>
+
+  <option value="1101">کویت</option>
+
+  <option value="1091">کیریباتی</option>
+
+  <option value="761">گابن</option>
+
+  <option value="771">گامبیا</option>
+
+  <option value="841">گرانادا</option>
+
+  <option value="781">گرجستان</option>
+
+  <option value="881">گرنزی</option>
+
+  <option value="831">گرینلند</option>
+
+  <option value="871">گواتمالا</option>
+
+  <option value="851">گوادلوپ</option>
+
+  <option value="861">گوام</option>
+
+  <option value="911">گویان</option>
+
+  <option value="741">گویان فرانسه</option>
+
+  <option value="891">گینه</option>
+
+  <option value="651">گینه استوایی</option>
+
+  <option value="901">گینه بیسائو</option>
+
+  <option value="1121">لائوس</option>
+
+  <option value="1141">لبنان</option>
+
+  <option value="1131">لتونی</option>
+
+  <option value="1151">لسوتو</option>
+
+  <option value="1651">لهستان</option>
+
+  <option value="1201">لوکزامبورگ</option>
+
+  <option value="1161">لیبریا</option>
+
+  <option value="1171">لیبی</option>
+
+  <option value="1191">لیتوانی</option>
+
+  <option value="1181">لیختنشتاین</option>
+
+  <option value="1221">ماداگاسکار</option>
+
+  <option value="1291">مارتینیک</option>
+
+  <option value="1231">مالاوی</option>
+
+  <option value="1271">مالت</option>
+
+  <option value="1251">مالدیو</option>
+
+  <option value="1241">مالزی</option>
+
+  <option value="1261">مالی</option>
+
+  <option value="1321">مایوت</option>
+
+  <option value="961">مجارستان</option>
+
+  <option value="1391">مراکش</option>
+
+  <option value="631">مصر</option>
+
+  <option value="1361">مغولستان</option>
+
+  <option value="2361">مقدونیه</option>
+
+  <option value="1331">مکزیک</option>
+
+  <option value="1301">موریتانی</option>
+
+  <option value="1311">موریس</option>
+
+  <option value="1401">موزامبیک</option>
+
+  <option value="1351">موناکو</option>
+
+  <option value="1381">مونتسرات</option>
+
+  <option value="1371">مونته نگرو</option>
+
+  <option value="1411">میانمار</option>
+
+  <option value="1341">میکرونزی</option>
+
+  <option value="1431">نائورو</option>
+
+  <option value="1421">نامیبیا</option>
+
+  <option value="1441">نپال</option>
+
+  <option value="1551">نروژ</option>
+
+  <option value="1491">نیجر</option>
+
+  <option value="1501">نیجریه</option>
+
+  <option value="1481">نیکاراگوئه</option>
+
+  <option value="1471">نیوزلند</option>
+
+  <option value="1511">نیووی</option>
+
+  <option value="921">هائیتی</option>
+
+  <option value="1451">هلند</option>
+
+  <option value="941">هندوراس</option>
+
+  <option value="981">هندوستان</option>
+
+  <option value="2311">والیس و فوتونا</option>
+
+  <option value="2281">وانواتو</option>
+
+  <option value="2291">ونزوئلا</option>
+
+  <option value="2301">ویتنام</option>
+
+  <option value="2331">یمن</option>
+
+  <option value="821">یونان</option>
+
+</select>
+
+
+        <span class="help-block m-b-none help_span"></span>
+
+
+
+            <span class="help-block m-b-none" id="n-description" style="color: #0e886f"></span>
+
+
+
+
+
+
+
+    </div>
+    <div class="col-sm-2"></div>
+</div>
+
+
+
+
+
+
+
+<div
+     class="form-group ">
+    <label class="col-sm-3 control-label" style="margin-left:0px;">نوع گذرنامه
+        <span class="required_field">*</span>
+    </label>
+
+    <div class="col-sm-7">
+
+
+                <select name="passport_type" class="select2_combo form-control" required data-toggle=&#39;tooltip&#39; data-placement=&#39;left&#39; ="" required id="id_passport_type">
+  <option value="" selected>---------</option>
+
+  <option value="1">عادی</option>
+
+  <option value="2">خدمت</option>
+
+  <option value="3">سیاسی</option>
+
+  <option value="4">مدرک مسافرتی</option>
+
+  <option value="5">لسه پاسه</option>
+
+  <option value="7">رسمی</option>
+
+</select>
+
+
+        <span class="help-block m-b-none help_span"></span>
+
+
+
+
+
+
+
+    </div>
+    <div class="col-sm-2"></div>
+</div>
+
+
+
+
+
+
+
+<div
+     class="form-group ">
+    <label class="col-sm-3 control-label" style="margin-left:0px;">محل اخذ روادید
+        <span class="required_field">*</span>
+    </label>
+
+    <div class="col-sm-7">
+
+
+                <select name="issuer_agent" class="select2_combo form-control" required data-toggle=&#39;tooltip&#39; data-placement=&#39;left&#39; ="" required id="id_issuer_agent">
+  <option value="" selected>------------</option>
+
+  <option value="11">فرودگاه بین المللی امام خمینی (ره)  - تهران</option>
+
+  <option value="21">فرودگاه بین المللی مشهد</option>
+
+  <option value="41">سرکنسولگری جمهوری اسلامی ایران - دبی</option>
+
+  <option value="61">سفارت جمهوری اسلامی ایران - ابوظبی</option>
+
+  <option value="71">فرودگاه بین المللی شیراز</option>
+
+  <option value="81">سفارت جمهوری اسلامی ایران ـ سنگاپور</option>
+
+  <option value="101">سفارت جمهوری اسلامی ایران- آنکارا</option>
+
+  <option value="111">سرکنسولگری جمهوری اسلامی ایران- ارزروم</option>
+
+  <option value="121">سرکنسولگری جمهوری اسلامی ایران - استانبول</option>
+
+  <option value="131">سرکنسولگری جمهوری اسلامی ایران - طرابوزان</option>
+
+  <option value="151">سفارت جمهوری اسلامی ایران - اسلام آباد</option>
+
+  <option value="161">سرکنسولگری جمهوری اسلامی ایران- پیشاور</option>
+
+  <option value="171">سرکنسولگری جمهوری اسلامی ایران - کراچی</option>
+
+  <option value="181">سرکنسولگری جمهوری اسلامی ایران - کویته</option>
+
+  <option value="191">سرکنسولگری جمهوری اسلامی ایران - لاهور</option>
+
+  <option value="201">سفارت جمهوری اسلامی ایران - امان</option>
+
+  <option value="211">سفارت جمهوری اسلامی ایران- بانکوک</option>
+
+  <option value="221">سفارت جمهوری اسلامی ایران بغداد</option>
+
+  <option value="231">سرکنسولگری جمهوری اسلامی ایران- بصره</option>
+
+  <option value="241">سرکنسولگری جمهوری اسلامی ایران - کربلا</option>
+
+  <option value="251">سرکنسولگری جمهوری اسلامی ایران - سلیمانیه</option>
+
+  <option value="261">سرکنسولگری جمهوری اسلامی ایران - اربیل</option>
+
+  <option value="271">سرکنسولگری جمهوری اسلامی ایران- نجف اشرف</option>
+
+  <option value="281">سفارت جمهوری اسلامی ایران - بیروت</option>
+
+  <option value="291">سفارت جمهوری اسلامی ایران ـ پکن</option>
+
+  <option value="301">سرکنسولگری جمهوری اسلامی ایران- شانگهای</option>
+
+  <option value="311">سرکنسولگری جمهوری اسلامی ایران - گوانجو</option>
+
+  <option value="321">سفارت جمهوری اسلامی ایران - پیونگ یانگ</option>
+
+  <option value="331">سفارت جمهوری اسلامی ایران- توکیو</option>
+
+  <option value="341">سفارت جمهوری اسلامی ایران- جاکارتا</option>
+
+  <option value="351">سفارت جمهوری اسلامی ایران- داکا</option>
+
+  <option value="361">سفارت جمهوری اسلامی ایران - دمشق</option>
+
+  <option value="371">سفارت جمهوری اسلامی ایران - دوحه</option>
+
+  <option value="381">سفارت جمهوری اسلامی ایران - دهلی نو</option>
+
+  <option value="391">سرکنسولگری جمهوری اسلامی ایران - مومبای</option>
+
+  <option value="401">سرکنسولگری جمهوری اسلامی ایران- حیدر آباد</option>
+
+  <option value="421">سفارت جمهوری اسلامی ایران - ریاض</option>
+
+  <option value="431">سرکنسولگری جمهوری اسلامی ایران - جده</option>
+
+  <option value="441">سفارت جمهوری اسلامی ایران - سئول</option>
+
+  <option value="511">سفارت جمهوری اسلامی ایران - کلمبو</option>
+
+  <option value="521">سفارت جمهوری اسلامی ایران - کوالالامپور</option>
+
+  <option value="531">سفارت جمهوری اسلامی ایران - کویت</option>
+
+  <option value="541">سفارت جمهوری اسلامی ایران - مانیل</option>
+
+  <option value="551">سفارت جمهوری اسلامی ایران- مسقط</option>
+
+  <option value="571">سرکنسولگری جمهوری اسلامی ایران-هنگ کنگ</option>
+
+  <option value="581">سفارت جمهوری اسلامی ایران- هانوی</option>
+
+  <option value="591">سفارت جمهوری اسلامی ایران -نیکوزیا</option>
+
+  <option value="601">سفارت جمهوری اسلامی ایران- باکو</option>
+
+  <option value="611">سرکنسولگری جمهوری اسلامی ایران- نخجوان</option>
+
+  <option value="621">سفارت جمهوری اسلامی - بیشکک</option>
+
+  <option value="631">سفارت جمهوری اسلامی ایران- دوشنبه</option>
+
+  <option value="641">سفارت جمهوری اسلامی ایران-تاشکند</option>
+
+  <option value="651">سفارت جمهوری اسلامی ایران- آستانه</option>
+
+  <option value="661">سرکنسولگری جمهوری اسلامی ایران- آکتائو</option>
+
+  <option value="671">سرکنسولگری جمهوری اسلامی ایران - آلماتی</option>
+
+  <option value="681">سرکنسولگری جمهوری اسلامی ایران- مرو</option>
+
+  <option value="691">سفارت جمهوری اسلامی ایران- عشق آباد</option>
+
+  <option value="701">سفارت جمهوری اسلامی ایران- بندر سری بگاوان</option>
+
+  <option value="711">سفارت جمهوری اسلامی ایران- ایروان</option>
+
+  <option value="721">سفارت جمهوری اسلامی ایران -کیف</option>
+
+  <option value="731">سفارت جمهوری اسلامی ایران - تفلیس</option>
+
+  <option value="741">سرکنسولگری جمهوری اسلامی ایران - باتومی</option>
+
+  <option value="751">سفارت جمهوری اسلامی ایران- آتن</option>
+
+  <option value="761">سفارت جمهوری اسلامی ایران- استکهلم</option>
+
+  <option value="771">سفارت جمهوری اسلامی ایران- اسلو</option>
+
+  <option value="781">دفتر نمایندگی جمهوری اسلامی ایران - ژنو</option>
+
+  <option value="791">سفارت جمهوری اسلامی ایران- برن</option>
+
+  <option value="801">سفارت جمهوری اسلامی ایران - بروکسل</option>
+
+  <option value="811">سفارت جمهوری اسلامی ایران -  بلگراد</option>
+
+  <option value="821">سرکنسولگری جمهوری اسلامی ایران- فرانکفورت</option>
+
+  <option value="831">سرکنسولگری جمهوری اسلامی ایران - مونیخ</option>
+
+  <option value="841">سرکنسولگری جمهوری اسلامی ایران- هامبورگ</option>
+
+  <option value="851">سفارت جمهوری اسلامی ایران - برلین</option>
+
+  <option value="861">سفارت جمهوری اسلامی ایران- بوداپست</option>
+
+  <option value="871">سفارت جمهوری اسلامی ایران - بخارست</option>
+
+  <option value="881">سفارت جمهوری اسلامی ایران - پاریس</option>
+
+  <option value="891">سفارت جمهوری اسلامی ایران- پراگ</option>
+
+  <option value="901">سفارت جمهوری اسلامی ایران- لوبلیانا</option>
+
+  <option value="911">سفارت جمهوری اسلامی ایران -رم</option>
+
+  <option value="921">سرکنسولگری جمهوری اسلامی ایران- میلان</option>
+
+  <option value="931">سفارت جمهوری اسلامی ایران - صوفیا</option>
+
+  <option value="941">سفارت جمهوری اسلامی ایران - کپنهاک</option>
+
+  <option value="951">سفارت جمهوری اسلامی ایران - لاهه</option>
+
+  <option value="961">سفارت جمهوری اسلامی ایران- لیسبون</option>
+
+  <option value="971">سفارت جمهوری اسلامی ایران مادرید</option>
+
+  <option value="981">سفارت جمهوری اسلامی ایران - مسکو</option>
+
+  <option value="991">سرکنسولگری جمهوری اسلامی ایران- آستراخان</option>
+
+  <option value="1001">سرکنسولگری جمهوری اسلامی ایران -قازان</option>
+
+  <option value="1011">سفارت جمهوری اسلامی ایران-  ورشو</option>
+
+  <option value="1031">سفارت جمهوری اسلامی ایران- وین</option>
+
+  <option value="1041">سفارت جمهوری اسلامی - هلسینکی</option>
+
+  <option value="1061">سفارت جمهوری اسلامی ایران زاگرب</option>
+
+  <option value="1081">سفارت جمهوری اسلامی ایران - سارایوو</option>
+
+  <option value="1091">سفارت جمهوری اسلامی ایران- مینسک</option>
+
+  <option value="1101">سفارت جمهوری اسلامی ایران- آدیس آبابا</option>
+
+  <option value="1111">سفارت جمهوری اسلامی ایران - ابیجان</option>
+
+  <option value="1121">سفارت جمهوری اسلامی ایران - اکرا</option>
+
+  <option value="1131">سفارت جمهوری اسلامی ایران- الجزیره</option>
+
+  <option value="1141">سفارت جمهوری اسلامی ایران- باماکو</option>
+
+  <option value="1151">سفارت جمهوری اسلامی ایران - آنتاناناریو</option>
+
+  <option value="1171">سفارت جمهوری اسلامی ایران - تونس</option>
+
+  <option value="1181">سفارت جمهوری اسلامی ایران- حراره</option>
+
+  <option value="1201">سفارت جمهوری اسلامی ایران - دارالسلام</option>
+
+  <option value="1211">سفارت جمهوری اسلامی ایران - داکار</option>
+
+  <option value="1231">سفارت جمهوری اسلامی ایران- پرتوریا</option>
+
+  <option value="1241">سفارت جمهوری اسلامی ایران - طرابلس</option>
+
+  <option value="1251">سفارت جمهوری اسلامی ایران- فری تاون</option>
+
+  <option value="1261">دفتر حفاظت منافع جمهوری اسلامی ایران- قاهره</option>
+
+  <option value="1271">سفارت جمهوری اسلامی ایران - کوناکری</option>
+
+  <option value="1281">سفارت جمهوری ایران - کینشازا</option>
+
+  <option value="1291">سفارت جمهوری اسلامی - ابوجا</option>
+
+  <option value="1311">سفارت جمهوری اسلامی ایران - نایروبی</option>
+
+  <option value="1321">سفارت  جمهوری اسلامی ایران - نواکشوت</option>
+
+  <option value="1331">سفارت جمهوری اسلامی ایران - نیامی</option>
+
+  <option value="1351">سفارت جمهوری اسلامی ایران- کامپالا</option>
+
+  <option value="1361">سفارت جمهوری اسلامی ایران- کانبرا</option>
+
+  <option value="1371">سفارت جمهوری اسلامی ایران- ولینگتون</option>
+
+  <option value="1401">دفتر حفاظت منافع جمهوری اسلامی ایران - واشنگتن</option>
+
+  <option value="1411">سفارت جمهوری اسلامی ایران - ماناگوا</option>
+
+  <option value="1421">سفارت جمهوری اسلامی ایران- مکزیکو سیتی</option>
+
+  <option value="1431">سفارت جمهوری اسلامی ایران - هاوانا</option>
+
+  <option value="1441">سفارت جمهوری اسلامی ایران - برازیلیا</option>
+
+  <option value="1461">سفارت جمهوری اسلامی ایران - بوگوتا</option>
+
+  <option value="1471">سفارت جمهوری اسلامی ایران- کاراکاس</option>
+
+  <option value="1481">سفارت جمهوری اسلامی ایران - مونته ویدئو</option>
+
+  <option value="1491">سفارت جمهوری اسلامی ایران - کیتو</option>
+
+  <option value="1501">سفارت جمهوری اسلامی ایران- لاپاز</option>
+
+  <option value="1511">سفارت جمهوری اسلامی ایران - سانتیاگو</option>
+
+  <option value="1541">فرودگاه بین المللی بندر عباس</option>
+
+  <option value="1551">سفارت جمهوری اسلامی ایران - لندن</option>
+
+  <option value="1561">فرودگاه کیش</option>
+
+  <option value="1571">فرودگاه بین المللی اصفهان</option>
+
+  <option value="1581">سفارت جمهوری اسلامی ایران - دوبلین</option>
+
+  <option value="1591">فرودگاه بین المللی تبریز</option>
+
+  <option value="1601">فرودگاه بین المللی بوشهر</option>
+
+  <option value="1611">فرودگاه بین المللی ارومیه</option>
+
+  <option value="1621">فرودگاه بین المللی قشم</option>
+
+  <option value="1631">فرودگاه بین المللی کرمان</option>
+
+  <option value="1671">سفارت جمهوری اسلامی - بوینس آیرس</option>
+
+  <option value="1701">سفارت جمهوری اسلامی ایران -واگادوگو</option>
+
+  <option value="1711">سفارت جمهوری اسلامی ایران - ویندهوک</option>
+
+  <option value="1721">سرکنسولگری جمهوری اسلامی ایران- حلب</option>
+
+  <option value="1731">سرکنسولگری جمهوری اسلامی ایران - قاپان</option>
+
+</select>
+
+
+        <span class="help-block m-b-none help_span">سفارت یا نمایندگی ایران که قصد تحویل مدارک و یا دریافت روادید را دارید</span>
+
+
+
+
+
+
+
+    </div>
+    <div class="col-sm-2"></div>
+</div>
+
+
+
+
+
+
+
+<div
+     class="form-group ">
+    <label class="col-sm-3 control-label" style="margin-left:0px;">کد امنیتی
+        <span class="required_field">*</span>
+    </label>
+
+    <div class="col-sm-7">
+
+
+                <img src="/ecaptcha/image/205919f7a02076e30d3869fecc647e1407a54277/" alt="ecaptcha" class="ecaptcha" />
+<input type="hidden" name="captcha_0" value="205919f7a02076e30d3869fecc647e1407a54277" class="form-control" required data-toggle=&#39;tooltip&#39; data-placement=&#39;left&#39; ="" required id="id_captcha_0"><input type="text" name="captcha_1" class="form-control" required data-toggle=&#39;tooltip&#39; data-placement=&#39;left&#39; ="" required id="id_captcha_1" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false">
+
+
+        <span class="help-block m-b-none help_span"></span>
+
+
+
+
+
+
+
+    </div>
+    <div class="col-sm-2"></div>
+</div>
+
+                                        <div class="row button_holder">
+                                            <div class="col-sm-3"></div>
+                                            <div class="col-sm-7 button-wrapper">
+                                                <button type="button" class="btn btn-primary btn-w-m btn-outline "
+                                                        name="first_step_submit" id="first_step_submit_btn">
+                                                    <i class="fa fa-save"></i>
+                                                    &nbsp;&nbsp;ثبت و ادامه</button>
+
+                                            </div>
+                                            <div class="col-sm-2"></div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2" style="margin-top: 70px">
+
+
+        </div>
+    </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="navy-section testimonials animated fadeIn wow" id="testimonials" style="margin-top: 50px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 xhide">
+                <h1 style="">What our users say</h1>
+
+                <div class="testimonials-text" style="">&nbsp;</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<section class="gray-section contact animated fadeIn wow" id="contact" style="margin-top: 0;">
+    <div class="container">
+        <div class="row m-b-lg">
+            <div class="col-lg-12 text-center">
+                <div class="navy-line">&nbsp;</div>
+
+                <h1>تماس با ما</h1>
+
+                <p>جهت دریافت پاسخ سوالات مربوط به ثبت درخواست و یا ارائه بازخورد استفاده از این تارنما، از طریق تلفن و یا پست الکترونیکی با ما در تماس باشید.</p>
+            </div>
+        </div>
+
+        <div class="row m-b-lg">
+
+                <div class="col-lg-3 col-lg-offset-3 ">
+                    <address><a href="#">
+
+                        <img alt="iran-flag-symbol" src="/static/theme/img/evisa-fa-logo.png"/></a>
+
+
+                    </address>
+                </div>
+
+            <div class="col-lg-3"><abbr class="fa fa-phone contact-icon" title="Phone">
+                <small>(فرانسه)</small>
+            </abbr>  ۶۹۷۹۶۰ ۱۴۰ (۳۳+) <br/>
+
+                <abbr class="fa fa-phone contact-icon" title="Phone">
+                    <small>(عمان)</small>
+                </abbr>  ۶۹۶۹۴۴ ۲۴ (۹۶۸+) <br/>
+
+
+
+            <abbr    class="fa fa-phone contact-icon" title="Phone">
+                    <small>(امارات)</small>
+                </abbr>  ۴۴۹۷۶ ۳۴ (۹۷۱۴+)
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12 text-center"><a class="btn btn-outline btn-primary"
+                                                  href="mailto:evisa@mfa.ir">به ما ایمیل بزنید</a>
+
+                <p class="m-t-sm">یا ما را در شبکه های اجتماعی دنبال کنید</p>
+
+                <ul class="list-inline social-icon">
+                    <li>&nbsp;</li>
+                    <li>&nbsp;</li>
+                    <li>&nbsp;</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 text-center m-t-lg m-b-lg features-text">
+                <p><strong>حق نشر  ۱۴۰۲© روادید الکترونیکی - وزارت امور خارجه جمهوری اسلامی ایران</strong><br/>
+                    این سامانه توسط اداره کل کنسولی وزارت امور خارجه جمهوری اسلامی ایران مدیریت می گردد. | <a
+                            href="#">حفظ حریم خصوصی </a> | <a
+                            href="#">شرایط و ضوابط استفاده </a></p>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+<div class="modal"></div>
+</body>
+
+
+
+
+
+    <script src="/static/js/base/direction_input.js?v=10.07.1"></script>
+
+    <script src="/static/js/base/submit_forms_csrf.js?v=10.07.1"></script>
+
+    <script src="/static/theme/js/wow.min.js?v=10.07.1"></script>
+
+    <script>
+        $(document).ready(function () {
+
+                var visa_desc_dict = {
+
+                        "101" : `این نوع روادید مربوط به همسر و فرزندان خارجی بانوان ایرانی که اسامی آنان در شناسنامه ایرانی ایشان ثبت گردیده است. کسانی که هنوز ثبت قانونی ازدواج نزد مراجع ایرانی ننموده اند، از طریق &quot;روادید بستگان&quot; درخواست شان را ثبت نمایند.`,
+
+                        "261" : `اتباع خارجی که قصد بازدید کوتاه مدت از بستگان ایرانی خود  را داشته باشند، می توانند با بارگذاری مدارک مصدق رابطه خانوادگی روادید بستگان دریافت نمایند`,
+
+                }; // create an empty array
+
+              var nat_desc_dict = {
+
+                        "21" : `برای این ملیت، آژانس های مسافرتی داخل ایران مجوز ثبت درخواست روادید جهانگردی با محل اخذ روادید نمایندگی های جمهوری اسلامی ایران در افغانستان را ندارند. شایان ذکر است ثبت درخواست روادید جهانگردی با محل اخذ روادید به غیر از کشور افغانستان (منوط به داشتن اقامت آن کشور) امکانپذیر خواهدبود.`,
+
+                        "2221" : `برای ثبت درخواست روادید جهانگردی، درمان و زیارتی از طریق آژانسهای توریستی اقدام نمائید. برای ثبت درخواست روادید ورود از طریق میزبان داخل جمهوری اسلامی ایران اقدام نمائید.`,
+
+                }; // create an empty array
+
+                $("#id_nationality").on('change',function (e) {
+                var nat_id=$("#id_nationality").val();
+                if(nat_id) {
+                    if (nat_id in nat_desc_dict) {
+                        $('#n-description').html(nat_desc_dict[nat_id]);
+                        $('#n-description').show(500);
+                    }
+                    else {
+                        $('#n-description').hide(500);
+                    }
+                }else{
+                        $('#n-description').hide(500);
+                    }
+
+                });
+
+
+                $("#id_visa_type").on('change',function (e) {
+                var visa_id=$("#id_visa_type").val();
+                if(visa_id) {
+                    if (visa_id in visa_desc_dict) {
+                        $('#v-description').html(visa_desc_dict[visa_id]);
+                        $('#v-description').show(500);
+                    }
+                    else {
+                        $('#v-description').hide(500);
+                    }
+                }else{
+                        $('#v-description').hide(500);
+                    }
+
+                });
+
+                $("#id_visa_type").trigger("change");
+
+
+
+
+                var $airport_list = [
+
+                        '11',
+
+                        '21',
+
+                        '71',
+
+                        '1521',
+
+                        '1531',
+
+                        '1541',
+
+                        '1571',
+
+                        '1591',
+
+                        '1601',
+
+                        '1611',
+
+                        '1621',
+
+                        '1631',
+
+                        '1641',
+
+                        '1651',
+
+                        '1681',
+
+                ];
+                $('#first_step_submit_btn').on('click', function () {
+                    var selected_agent = $('#id_issuer_agent').val();
+                    var lang = "fa";
+                    var text = "";
+                    var picture_error = $("#id_picture").parents(".form-group").hasClass('has-error');
+                    var passport_error = $("#id_passport_image").parents(".form-group").hasClass('has-error');
+                    var text_error = '';
+                    if (picture_error){
+                        text_error +="اسکن عکس پرسنلی شما استانداردهای لازم جهت ثبت درخواست را رعایت نکرده است" + "\n"
+                    }
+                    if(passport_error){
+                        text_error +="اسکن گذرنامه شما استانداردهای لازم جهت ثبت درخواست را رعایت نکرده است"
+                    }
+                    if (picture_error || passport_error){
+                        swal({
+                            type: 'error',
+                            title: '',
+                            text: text_error,
+                            confirmButtonText : "قبول"});
+                    }else {
+                    if (lang == 'ar' || lang == 'fa') {
+                        text1 = "<div style='padding: 10px 20px;background-color: antiquewhite;border-radius: 5px;color: #4e4e4e;text-align:right;'><h3>جهت دریافت روادید فرودگاهی، رعایت نکات ذیل الزامی است.</h3><ul><li>بعد از تکمیل فرم درخواست روادید، برگه تایید ثبت نام را چاپ نمایید. ارائه این برگه به گیشه روادید فرودگاه الزامی میباشد.</li> <li>تبعه کشورهایی که امکان دریافت روادید فرودگاهی ایران را دارا می باشند، باید هزینه های مربوط به روادید را با ارز یورو در فرودگاه به گیشه بانک پرداخت نمایند.</li><li>دارندگان مدارک مسافرتی و پناهندگی اجازه درخواست روادید فرودگاهی را ندارند.</li></ul> </div></br> آیا اطمینان دارید؟";
+                    }
+                    else {
+                        text1 = "<div style='padding: 10px 20px;background-color: antiquewhite;border-radius: 5px;color: #4e4e4e;text-align:left;'><h3>جهت دریافت روادید فرودگاهی، رعایت نکات ذیل الزامی است.</h3><ul><li>بعد از تکمیل فرم درخواست روادید، برگه تایید ثبت نام را چاپ نمایید. ارائه این برگه به گیشه روادید فرودگاه الزامی میباشد.</li> <li>تبعه کشورهایی که امکان دریافت روادید فرودگاهی ایران را دارا می باشند، باید هزینه های مربوط به روادید را با ارز یورو در فرودگاه به گیشه بانک پرداخت نمایند.</li><li>دارندگان مدارک مسافرتی و پناهندگی اجازه درخواست روادید فرودگاهی را ندارند.</li></ul> </div></br> آیا اطمینان دارید؟";
+
+                    }
+                    if ($airport_list.indexOf(selected_agent) >= 0) {
+                        swal({
+                            title: "شما یک فرودگاه را به عنوان محل اخذ روادید انتخاب کرده اید",
+                            html: true,
+                            text: text1,
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "ادامه",
+                            cancelButtonText: "انصراف",
+                            closeOnConfirm: false,
+                            closeOnCancel: true
+                        }, function (isConfirm) {
+                            if (isConfirm) {
+                                $('<input />').attr('type', 'hidden')
+                                    .attr('name', "first_step_submit")
+                                    .attr('value', "first_step_submit")
+                                    .appendTo('#register_form');
+                                var register_form = $('#register_form');
+                                register_form.submit();
+                            }
+                        });
+
+                    }
+                    else {
+                        $('<input />').attr('type', 'hidden')
+                            .attr('name', "first_step_submit")
+                            .attr('value', "first_step_submit")
+                            .appendTo('#register_form');
+                        var register_form = $('#register_form');
+                        register_form.submit();
+                    }
+                }
+                });
+
+                var $p_list = [
+
+                        '2451',
+
+                    ];
+                $('#id_picture').on('change', function (e) {
+                    $("#id_box_picture").empty();
+                    $('#id_box_picture').show();
+
+                    var $formdata = new FormData();
+                    if ($('#id_picture').val() != ""){
+                        $formdata.append('image', $('#id_picture')[0].files[0]);
+                        var $name = $('#id_picture')[0].files[0]['name'];
+                    $(".photo_error #image-tools-loading").show();
+
+                            var selected_nationality = $('#id_nationality').val();
+                            if ($p_list.indexOf(selected_nationality) < 0) {
+
+                    validate_image(this)
+                    $(img).height(200);
+                    var has_error = $(this).parents(".form-group").hasClass("has-error")
+                    if (!has_error){
+                        $.ajax({
+                        type: "POST",
+                        url: "/fa/api/photo/12345".replace(/12345/, $name),
+                        data: $formdata,
+                        cache: false,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            $(".photo_error #image-tools-loading").hide();
+                            $('#id_picture').parents(".form-group").removeClass('has-error');
+                            if (typeof response == 'object') {
+                                if($('#id_picture').val()) {
+                                    $('#id_picturetypeError').remove();
+                                    $('#id_picture').parents(".form-group").addClass('has-error');
+                                    var $html = "<div class='alert alert-danger'>";
+                                    for (var x in response.image) {
+                                        $html += '<li>' + response.image[x] + '</li>';
+                                    }
+                                    $html += "</div>";
+                                    $('#id_box_picture').append($html);
+                                }
+                            }
+                            else {
+                                $('#id_picturetypeError').remove();
+                                $('#id_picture').parents(".form-group").removeClass('has-error');
+                                var $html = "<div class='alert alert-success'>" + "<i class='fa fa-check ' id='photoStateIcon' style='color: #41b392;font-size: 20px'></i><i>";
+                                $html += response;
+                                $html += "</i></div>";
+                                $('#id_box_picture').append($html);
+                            }
+                        },
+                        error: function (response) {
+                            if (response.status == 403) {
+                                $(".photo_error #image-tools-loading").hide();
+                                var $html = "<div class='alert alert-danger'>" +
+                                            "<p><b>ارسال بیش از حد مجاز</b></p>" +
+                                            "<p>سامانه روادید بیش از حد مجاز از سوی دستگاه شما درخواست دریافت کرده است. <br> لطفا تا لحظاتی دیگر مجددا تلاش نمایید. </p></div>";
+                                $('#id_box_picture').append($html);
+                            }
+                        }
+                        });
+                    }
+
+                    }
+
+                    }
+            });
+
+                $('#id_passport_image').on('change', function (e) {
+                    $("#id_box_passport").empty();
+                    $('#id_box_passport').show();
+
+                    var $formdata = new FormData();
+                    if ($('#id_passport_image').val() != "")
+                        $formdata.append('image', $('#id_passport_image')[0].files[0]);
+                    var $name = $('#id_passport_image')[0].files[0]['name'];
+                    $(".passport_error #image-tools-loading").show();
+
+                    var selected_nationality = $('#id_nationality').val();
+                    if ($p_list.indexOf(selected_nationality) < 0) {
+
+                    validate_image(this)
+                    var has_error = $(this).parents(".form-group").hasClass("has-error")
+                    if (!has_error) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/fa/api/passport/12345".replace(/12345/, $name),
+                            data: $formdata,
+                            cache: false,
+                            processData: false,
+                            contentType: false,
+                            success: function (response) {
+                                $('#id_passport_image').parents(".form-group").removeClass('has-error');
+                                $(".passport_error #image-tools-loading").hide();
+                                if (typeof response == 'object') {
+                                    if ($('#id_passport_image').val()) {
+                                        $('#id_passport_imagetypeError').remove();
+                                        $('#id_passport_image').parents(".form-group").addClass('has-error');
+                                        var $html = "<div class='alert alert-danger'>";
+                                        for (var x in response.image) {
+                                            $html += '<li>' + response.image[x] + '</li>';
+                                        }
+                                        $html += "</div>";
+                                        $('#id_box_passport').append($html);
+                                    }
+                                }
+                                else {
+                                    $('#id_passport_imagetypeError').remove();
+                                    $('#id_passport_image').parents(".form-group").removeClass('has-error');
+                                        var $html = "<div class='alert alert-success'>" + "<i class='fa fa-check ' id='photoStateIcon' style='color: #41b392;font-size: 20px'></i><i>";
+                                        $html += response;
+                                        $html += "</i></div>";
+                                    $('#id_box_passport').append($html);
+                                }
+                            },
+                            error: function (response) {
+                                if (response.status == 403) {
+                                    $(".passport_error #image-tools-loading").hide();
+                                    var $html = "<div class='alert alert-danger'>" +
+                                                "<p><b>ارسال بیش از حد مجاز</b></p>" +
+                                                "<p>سامانه روادید بیش از حد مجاز از سوی دستگاه شما درخواست دریافت کرده است. <br> لطفا تا لحظاتی دیگر مجددا تلاش نمایید. </p></div>";
+                                    $('#id_box_passport').append($html);
+                                }
+                            }
+                        });
+                    }
+
+                    }
+
+                });
+
+
+
+                    $('#id_nationality').on('change', function (e) {
+                        $('#id_box_picture').hide();
+                        $('#id_box_passport').hide();
+                    });
+
+
+            var hasExpireDateErr = false;
+            var hasIssueDateErr = false;
+            var hasBirthDateErr = false;
+            var hasPassportNumberErr = false;
+            var form = $("form#register_form");
+            $("#second_step_submit_btn").on('click', function (e) {
+                $("#last_preview").attr("src",$("#id_picture").parent().find(".preview-img").attr("src"))
+                var name = $(this).attr('name');
+                form.validate().settings.ignore = ":disabled";
+                var hasError = hasIssueDateErr || hasExpireDateErr || hasBirthDateErr || hasPassportNumberErr;
+                if (hasError) {
+                    return false;
+                }
+                // Start validation; Prevent form submission if false
+
+                verify_modal(form, name);
+            });
+
+
+            function verify_modal(form, name) {
+                $('#register_form').validate({
+                    errorPlacement: function (error, element) {
+                        element.before(error);
+                    },
+                    rules: {
+                        confirm: {
+                            equalTo: "#password"
+                        },
+                        phone_number: {
+                            digits: true
+                        },
+                        mobile: {
+                            digits: true
+                        },
+                        iran_phone_number: {
+                            digits: true
+                        },
+                        email: {
+                            email: true
+                        },
+                        birth_date: {
+                            date: true
+                        },
+                        expire_date: {
+                            date: true
+                        },
+                        passport_issue_date: {
+                            date: true
+                        }
+                    }
+                });
+                var visa_type;
+                var nationality;
+                var entry_option;
+                var issuer_agent;
+                var passport_type;
+                var is_urgent;
+                var float;
+                var country_extrafield;
+
+                if ($('#register_form').valid()) {
+                    issuer_agent = $("input[name='issuer_agent_id']").val();
+                    visa_type = $("select[name='visa_type']").children("option:selected").val();
+                    nationality = $("select[name='nationality']").children("option:selected").val();
+                    entry_option = $("select[name='entry_option']").children("option:selected").val();
+                    country_extrafield = $('#country_extrafield_1').val();
+                    passport_type = $("select[name='passport_type']").children("option:selected").val();
+                    is_urgent = $("input[name='is_urgent']").is(':checked');
+                    var lang = "fa";
+                    float = "right"
+                    if (lang == 'ar' || 'fa'){
+                        float = "left"
+                    }
+
+                    $('#verifyModal .modal-body').html("");
+                    var fields = $(form).find('div.form-group');
+                    var formFields = new Array();
+                    var table = $("<table classs='table'>");
+                    var div = $("<div class='placeOfIssue'>");
+
+                    for (i = 0; i < fields.length; i++) {
+                        //Check if in this form-group input type if not file type
+                        if (($(fields[i]).css('display') == 'none' || ($(fields[i]).find('img').length > 0))) {
+                            continue;
+                        }
+                        if ($(fields[i]).find('input[type=file]').length <= 0) {
+                            var labelTxt = $(fields[i]).find('label.control-label').html();
+
+                            var spanIndex = labelTxt.indexOf('<');
+
+                            if (spanIndex != -1) {
+                                labelTxt = labelTxt.substring(0, spanIndex)
+                            }
+
+                            var inputTxt = $(fields[i]).find('input[type=text]').val()
+                                || $(fields[i]).find('input[type=email]').val()
+                                || $(fields[i]).find('textarea').val()
+                                || $(fields[i]).find('input[type=checkbox]').is(':checked')
+                                || $($(fields[i]).find('span.select2-chosen')[0]).text();
+
+
+                            formFields.push(
+                                {
+                                    label: labelTxt,
+                                    input: inputTxt
+                                });
+                            if (inputTxt == true) {
+                                inputTxt = "بله"
+                            } else if (inputTxt == false) {
+                                inputTxt = "خیر"
+                            }
+                            var emailclass = ''
+                            if (inputTxt.includes("@")) {
+                                emailclass = 'emailInput'
+                            }
+                            if (i % 2 == 0) {
+                                table.append("<tr><td style='font-size:15px;'class='" + emailclass + "'>" + labelTxt + "</td><td style='font-weight:700;' class='" + emailclass + "'>" + inputTxt + "</td>");
+                            } else {
+                                table.append("<tr class='highlighted'><td style='font-size:15px' class='" + emailclass + "'>" + labelTxt + "</td><td style='font-weight:700;' class='" + emailclass + "'>" + inputTxt + "</td>");
+                            }
+
+                        }
+                    }
+
+                    div.append("<img src='/static/theme/img/issue.png' width='100' style='margin: auto 5px;float: " + float + "'><div><span style='font-size:15px;color:#666a6c;'>" + $('#id_value_issuer_agent').parent().parent().find('label.control-label').clone().children().remove().end().text() + "</span><span style='font-weight:700;color:#666a6c;    width: 50%;margin: 0px 20px;display: inline-table;'>" + $('#id_value_issuer_agent').val() + "</span><br>");
+                    $.ajax({
+                    type: "POST",
+                    url: "/fa/request/get_visa_fee/",
+                    data: {
+                        'visa_type': visa_type,
+                        'nationality': nationality,
+                        'issuer':issuer_agent,
+                        'entry_option':entry_option,
+                        'is_urgent':is_urgent,
+                        'passport_type':passport_type,
+                        'country_extrafield': country_extrafield,
+
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        if ( parseInt(response['visa_fee']) == 0){
+                            div.append("<div class='visa_free' id='visa_fee_display'><span style='font-size:15px;color:#666a6c;'>هزینه روادید</span><span style='font-weight:700;color:#41b394;    width: 40%;margin: 10px 41px 10px 61px;display: inline-table;'>رایگان</span></div>");
+                        }
+                        if ( parseInt(response['visa_fee']) > 0){
+                            div.append("<div class='visa_free' id='visa_fee_display'><span style='font-size:15px;color:#666a6c;'>هزینه روادید</span><span style='font-weight:700;color:#41b394;    width: 40%;margin: 10px 41px 10px 61px;display: inline-table;'>" + response['visa_fee'] + "&nbsp" + response['currency_unit'] + "</span></div>");
+                        }
+                            div.append("<div><span style='font-size:15px;color:#666a6c;text-align: center;float: right;margin: 10px 0px 20px;background: rgba(0,0,0,0.03);padding: 6px;'>اعتبار روادید انتخابی شما از زمان صدور حداکثر به مدت <span style='font-weight:700;'>" + response['max_validity'] + "</span> روز می باشد. همچنین مدت اقامت شما در ایران نباید بیشتر از <span style='font-weight:700;'>" + $('#id_duration').val() + "</span> روز باشد. </span></div></div>");
+
+
+
+
+                    },
+                    error: function (response) {
+                        if (response.status == 403) {
+                            $("#visa_fee_display").html("");
+                            var $html = "<div class='alert alert-danger'>" +
+                                        "<p><b>ارسال بیش از حد مجاز</b></p>" +
+                                        "<p>سامانه روادید بیش از حد مجاز از سوی دستگاه شما درخواست دریافت کرده است. <br> لطفا تا لحظاتی دیگر مجددا تلاش نمایید. </p></div>";
+                            $('#id_box_passport').append($html);
+                        }
+                        if (response.status == 500){
+                            var visa_block = $("#visa_fee_display")
+                            if (visa_block.length)
+                            $("#visa_fee_display").hide();
+
+                        }
+
+                    }
+                });
+
+                    $('#verifyModal .modal-body').append(table);
+                    $('#verifyModal .modal-body').append(div);
+                    $('#verifyModal').modal();
+                }
+                else {
+                    $('.error').first().next().focus();
+
+                    swal({
+                        title: "در فرم تقاضای روادید خطا وجود دارد. لطفا با دقت فرم را تکمیل نمایید.",
+                        type: "error",
+                        confirmButtonText: "قبول",
+                        showCancelButton: false,
+                        closeOnConfirm: true,
+                        animation: "slide-from-top"
+                    }, function () {
+                        $('html, body').animate({scrollTop: $('.error').first().next().offset().top - 120}, 'slow');
+
+                    });
+                }
+            }
+
+            $(function () {
+                $('#finish-form-submit').on('click', function () {
+                    $('<input />').attr('type', 'hidden')
+                        .attr('name', $(this).attr('name'))
+                        .attr('value', $(this).attr('name'))
+                        .appendTo('#register_form');
+                    var register_form = $('#register_form');
+                    register_form.submit();
+                    $("#register_form").submit();
+                });
+            });
+
+            function scrollToAnchor(aid) {
+                var aTag = $("#" + aid + "");
+                $('html,body').animate({scrollTop: aTag.offset().top}, 'slow');
+            }
+
+            $("#step12").click(function () {
+                scrollToAnchor('step2');
+            });
+            $("#step23").click(function () {
+                scrollToAnchor('step3');
+            });
+            $("#step34").click(function () {
+                scrollToAnchor('step4');
+            });
+            // Activate WOW.js plugin for animation on scrol
+            new WOW().init();
+
+
+            $('form :input[type!="hidden"]').each(function (i) {
+                $(this).attr('tabindex',i+1);
+            });
+
+            $("select.select2_combo").select2({
+            selectOnBlur: true, //auto select when select2 dropdown is closed
+
+        });
+            if ("fa" == 'fa') {
+                $('.select2-input').attr('lang', 'fa');
+            }
+        });
+    </script>
+
+        <script src="/static/js/base/FarsiType.js?v=10.07.1"></script>
+
+
+
+
+
+</html>

@@ -47,24 +47,24 @@ capsolver.api_key = "CAP-3FB2DE4C5B49EFCD7B3A990E03C26D80"
 # Retry the captcha solve for a maximum of 5 attempts
 max_attempts = 5
 for attempt in range(max_attempts):
-    with open("captcha.png", 'rb') as f:
-        img_base64 = base64.b64encode(f.read()).decode()
-    task_params = {
-        "type": "ImageToTextTask",
-        "module": "common",
-        "body": img_base64
-    }
-    solution = capsolver.solve(task_params)
-    captcha_text = solution.get("text", "")
-    print(solution)
+	with open("captcha.png", 'rb') as f:
+		img_base64 = base64.b64encode(f.read()).decode()
+	task_params = {
+		"type": "ImageToTextTask",
+		"module": "common",
+		"body": img_base64
+	}
+	solution = capsolver.solve(task_params)
+	captcha_text = solution.get("text", "")
+	print(solution)
+	
+	captcha_input = driver.find_element(By.ID, 'id_captcha_1')
+	captcha_input.clear()
+	captcha_input.send_keys(captcha_text)
+	
+	submit_button = driver.find_element(By.ID, 'first_step_submit_btn')
+	submit_button.click()
 
-    captcha_input = driver.find_element(By.ID, 'id_captcha_1')
-    captcha_input.clear()
-    captcha_input.send_keys(captcha_text)
-
-    submit_button = driver.find_element(By.ID, 'first_step_submit_btn')
-    submit_button.click()
-    
 # Close the browser
 time.sleep(60)
 driver.quit()
